@@ -1,0 +1,107 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = 'mekanismadditionsoverhaul'
+}
+
+tasks.withType(AbstractArchiveTask).configureEach {
+    archiveVersion = "${minecraft_version}-1.0"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+neoForge {
+    version = neo_version
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+def packMods = file(providers.gradleProperty('packMods').get())
+def devMods = files(
+        new File(packMods, 'Mekanism-1.21.1-10.7.19.85.jar'),
+        new File(packMods, 'MekanismAdditions-1.21.1-10.7.19.85.jar'),
+        new File(packMods, 'geckolib-neoforge-1.21.1-4.9.3.jar'),
+        new File(packMods, 'resourcefullib-neoforge-1.21-3.0.12.jar'),
+        new File(packMods, 'resourcefulconfig-neoforge-1.21-3.0.11.jar'),
+        new File(packMods, 'CreeperOverhaul-neoforge-1.21.1-4.0.6.jar'),
+        new File(packMods, 'endermanoverhaul-neoforge-1.21.1-2.0.3.jar'),
+        new File(packMods, 'SpiderOverhaul-0.0.6-NeoForge-v1.21.jar'),
+        new File(packMods, 'cloth-config-15.0.140-neoforge.jar'),
+        new File(packMods, 'jei-1.21.1-neoforge-19.64.0.455.jar')
+)
+
+def mezzConfig = zipTree(new File(packMods, 'mezz_config-1.21.1-neoforge-0.6.8-standalone.jar'))
+
+dependencies {
+    compileOnly devMods
+}
+
+// NeoForge only loads mods from the game mods folder. The legacy classpath is not scanned.
+def installDevMods = tasks.register('installDevMods', Copy) {
+    from devMods
+    from(mezzConfig) {
+        include 'META-INF/jarjar/*.jar'
+        eachFile { file ->
+            file.path = file.name
+        }
+    }
+    into layout.projectDirectory.dir('run/mods')
+    includeEmptyDirs = false
+    doFirst {
+        delete layout.projectDirectory.file('run/mods/mezz_config-1.21.1-neoforge-0.6.8-standalone.jar')
+    }
+}
+
+neoForge.runs.configureEach {
+    taskBefore installDevMods
+}
+
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    var replacements = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description
+    ]
+    inputs.properties replacements
+    expand replacements
+    from 'src/main/templates'
+    into layout.buildDirectory.dir('generated/sources/modMetadata')
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}

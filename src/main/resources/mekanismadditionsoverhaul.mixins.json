@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.mekanismadditionsoverhaul.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "com.mekanismadditionsoverhaul.mixin.MaoMixinPlugin",
+  "client": [
+    "AdditionsClientRegistrationMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
