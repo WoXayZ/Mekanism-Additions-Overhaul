@@ -20,13 +20,5 @@ public class BabySavannaEnderman extends SavannaEnderman {
         return true;
     }
 
-    @Override
-    public float getAgeScale() {
-        return 1.0F;
-    }
 
-    @Override
-    public EntityDimensions getDefaultDimensions(Pose pose) {
-        return this.getType().getDimensions();
-    }
 }

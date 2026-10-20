@@ -1,36 +1,30 @@
 package com.mekanismadditionsoverhaul.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import mekanism.additions.client.AdditionsClientRegistration;
-import mekanism.additions.common.entity.baby.EntityBabyCreeper;
-import mekanism.additions.common.registries.AdditionsEntityTypes;
-import com.mekanismadditionsoverhaul.creeper.client.PlainsBabyCreeperRenderer;
+import com.mekanismadditionsoverhaul.client.RendererReplacements;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.entity.EntityType;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(AdditionsClientRegistration.class)
 public class AdditionsClientRegistrationMixin {
-    @WrapOperation(
+    @Redirect(
             method = "registerRenderers",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/neoforged/neoforge/client/event/EntityRenderersEvent$RegisterRenderers;registerEntityRenderer(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/client/renderer/entity/EntityRendererProvider;)V"
+                    target = "Lnet/minecraftforge/client/event/EntityRenderersEvent$RegisterRenderers;registerEntityRenderer(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/client/renderer/entity/EntityRendererProvider;)V"
             )
     )
-    private static void mekanismadditionsoverhaul$plainsBabyCreeper(
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void mekanismadditionsoverhaul$replaceBaby(
             EntityRenderersEvent.RegisterRenderers event,
             EntityType<?> type,
-            EntityRendererProvider<?> provider,
-            Operation<Void> original
+            EntityRendererProvider<?> provider
     ) {
-        if (type == AdditionsEntityTypes.BABY_CREEPER.get()) {
-            original.call(event, type, (EntityRendererProvider<EntityBabyCreeper>) PlainsBabyCreeperRenderer::new);
-            return;
-        }
-        original.call(event, type, provider);
+        EntityRendererProvider<?> replacement = RendererReplacements.get(type);
+        event.registerEntityRenderer((EntityType) type, (EntityRendererProvider) (replacement != null ? replacement : provider));
     }
 }

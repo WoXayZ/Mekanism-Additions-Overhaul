@@ -1,6 +1,6 @@
 package com.mekanismadditionsoverhaul;
 
-import net.neoforged.fml.ModList;
+import net.minecraftforge.fml.ModList;
 
 import java.lang.reflect.Method;
 

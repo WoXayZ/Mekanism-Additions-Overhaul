@@ -22,11 +22,9 @@ public final class EntityBuilders {
         if (adult.canSpawnFarFromPlayer()) {
             builder.canSpawnFarFromPlayer();
         }
-        builder.setShouldReceiveVelocityUpdates(adult.trackDeltas());
-        EntityDimensions dimensions = adult.getDimensions().scale(scale);
+        EntityDimensions dimensions = adult.getDimensions();
         return builder
-                .sized(dimensions.width(), dimensions.height())
-                .eyeHeight(dimensions.height() * 0.83F)
+                .sized(dimensions.width * scale, dimensions.height * scale)
                 .clientTrackingRange(adult.clientTrackingRange())
                 .updateInterval(adult.updateInterval());
     }

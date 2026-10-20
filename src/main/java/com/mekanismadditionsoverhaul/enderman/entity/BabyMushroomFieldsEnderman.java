@@ -20,13 +20,5 @@ public class BabyMushroomFieldsEnderman extends MushroomFieldsEnderman {
         return true;
     }
 
-    @Override
-    public float getAgeScale() {
-        return 1.0F;
-    }
 
-    @Override
-    public EntityDimensions getDefaultDimensions(Pose pose) {
-        return this.getType().getDimensions();
-    }
 }

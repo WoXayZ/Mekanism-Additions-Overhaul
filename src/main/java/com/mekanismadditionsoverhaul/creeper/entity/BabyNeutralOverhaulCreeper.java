@@ -21,15 +21,7 @@ public class BabyNeutralOverhaulCreeper extends NeutralCreeper {
         return true;
     }
 
-    @Override
-    public float getAgeScale() {
-        return 1.0F;
-    }
 
-    @Override
-    public EntityDimensions getDefaultDimensions(Pose pose) {
-        return this.getType().getDimensions();
-    }
 
     @Override
     public void explode() {

@@ -1,6 +1,6 @@
 package com.mekanismadditionsoverhaul.spawn;
 
-import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.Codec;
 import com.mekanismadditionsoverhaul.config.MaoConfig;
 import net.minecraft.core.Holder;
 import net.minecraft.util.Mth;
@@ -8,21 +8,22 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
-import net.neoforged.neoforge.common.world.BiomeModifier;
-import net.neoforged.neoforge.common.world.MobSpawnSettingsBuilder;
-import net.neoforged.neoforge.common.world.ModifiableBiomeInfo;
+import net.minecraftforge.common.world.BiomeModifier;
+import net.minecraftforge.common.world.MobSpawnSettingsBuilder;
+import net.minecraftforge.common.world.ModifiableBiomeInfo;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public final class BabySpawnBiomeModifier implements BiomeModifier {
     public static final BabySpawnBiomeModifier INSTANCE = new BabySpawnBiomeModifier();
-    private static final MapCodec<BabySpawnBiomeModifier> CODEC = MapCodec.unit(INSTANCE);
+    private static final Codec<BabySpawnBiomeModifier> CODEC = Codec.unit(INSTANCE);
     private static final double GROUP_FRACTION = 0.5D;
 
     private BabySpawnBiomeModifier() {
     }
 
-    public static MapCodec<BabySpawnBiomeModifier> makeCodec() {
+    public static Codec<BabySpawnBiomeModifier> makeCodec() {
         return CODEC;
     }
 
@@ -63,7 +64,7 @@ public final class BabySpawnBiomeModifier implements BiomeModifier {
     }
 
     @Override
-    public MapCodec<? extends BiomeModifier> codec() {
+    public Codec<? extends BiomeModifier> codec() {
         return CODEC;
     }
 }

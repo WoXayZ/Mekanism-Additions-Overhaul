@@ -1,7 +1,9 @@
 package com.mekanismadditionsoverhaul.creeper.client;
 
 import com.mekanismadditionsoverhaul.client.MaoClient;
+import com.mekanismadditionsoverhaul.client.RendererReplacements;
 import com.mekanismadditionsoverhaul.creeper.CreeperModule;
+import mekanism.additions.common.registries.AdditionsEntityTypes;
 import tech.thatgravyboat.creeperoverhaul.common.entity.CreeperTypes;
 import tech.thatgravyboat.creeperoverhaul.common.entity.base.BaseCreeper;
 import tech.thatgravyboat.creeperoverhaul.common.entity.base.CreeperType;
@@ -11,6 +13,7 @@ public final class CreeperClient {
     }
 
     public static void init() {
+        MaoClient.addEarly(event -> RendererReplacements.put(AdditionsEntityTypes.BABY_CREEPER.get(), PlainsBabyCreeperRenderer::new));
         MaoClient.add(event -> {
             register(event, CreeperModule.JUNGLE.get(), CreeperTypes.JUNGLE);
             register(event, CreeperModule.BAMBOO.get(), CreeperTypes.BAMBOO);
@@ -27,11 +30,10 @@ public final class CreeperClient {
             register(event, CreeperModule.BEACH.get(), CreeperTypes.BEACH);
             register(event, CreeperModule.SNOWY.get(), CreeperTypes.SNOWY);
             register(event, CreeperModule.OCEAN.get(), CreeperTypes.OCEAN);
-            register(event, CreeperModule.BIRCH.get(), CreeperTypes.BIRCH);
         });
     }
 
-    private static <E extends BaseCreeper> void register(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers event, net.minecraft.world.entity.EntityType<E> type, CreeperType creeperType) {
+    private static <E extends BaseCreeper> void register(net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers event, net.minecraft.world.entity.EntityType<E> type, CreeperType creeperType) {
         event.registerEntityRenderer(type, context -> new BabyCreeperRenderer<>(context, creeperType));
     }
 }

@@ -1,6 +1,6 @@
 package com.mekanismadditionsoverhaul.mixin;
 
-import net.neoforged.fml.loading.LoadingModList;
+import net.minecraftforge.fml.loading.LoadingModList;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -21,9 +21,10 @@ public class MaoMixinPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         LoadingModList mods = LoadingModList.get();
-        return mods != null
-                && mods.getModFileById("creeperoverhaul") != null
-                && mods.getModFileById("geckolib") != null;
+        if (mods == null || mods.getModFileById("geckolib") == null) {
+            return false;
+        }
+        return mods.getModFileById("creeperoverhaul") != null || mods.getModFileById("endermanoverhaul") != null;
     }
 
     @Override

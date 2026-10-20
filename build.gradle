@@ -1,6 +1,6 @@
 plugins {
     id 'java-library'
-    id 'net.neoforged.moddev' version '2.0.148'
+    id 'net.minecraftforge.gradle' version '6.0.36'
 }
 
 version = mod_version
@@ -15,75 +15,72 @@ tasks.withType(AbstractArchiveTask).configureEach {
 }
 
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
 
-neoForge {
-    version = neo_version
+minecraft {
+    mappings channel: 'official', version: minecraft_version
 
     runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', layout.buildDirectory.file('createSrgToMcp/output.srg').get().asFile.absolutePath
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
         client {
-            client()
         }
         server {
-            server()
-            programArgument '--nogui'
-        }
-    }
-
-    mods {
-        "${mod_id}" {
-            sourceSet sourceSets.main
+            args '--nogui'
         }
     }
 }
 
-def packMods = file(providers.gradleProperty('packMods').get())
-def devMods = files(
-        new File(packMods, 'Mekanism-1.21.1-10.7.19.85.jar'),
-        new File(packMods, 'MekanismAdditions-1.21.1-10.7.19.85.jar'),
-        new File(packMods, 'geckolib-neoforge-1.21.1-4.9.3.jar'),
-        new File(packMods, 'resourcefullib-neoforge-1.21-3.0.12.jar'),
-        new File(packMods, 'resourcefulconfig-neoforge-1.21-3.0.11.jar'),
-        new File(packMods, 'CreeperOverhaul-neoforge-1.21.1-4.0.6.jar'),
-        new File(packMods, 'endermanoverhaul-neoforge-1.21.1-2.0.3.jar'),
-        new File(packMods, 'SpiderOverhaul-0.0.6-NeoForge-v1.21.jar'),
-        new File(packMods, 'cloth-config-15.0.140-neoforge.jar'),
-        new File(packMods, 'jei-1.21.1-neoforge-19.64.0.455.jar')
-)
-
-def mezzConfig = zipTree(new File(packMods, 'mezz_config-1.21.1-neoforge-0.6.8-standalone.jar'))
+repositories {
+    flatDir {
+        dirs(
+                'C:/Users/cdaguenet/curseforge/minecraft/Instances/Evolved Mekanism/mods',
+                'C:/Users/cdaguenet/curseforge/minecraft/Instances/Blackstone Block Renewed/mods',
+                'C:/Users/cdaguenet/curseforge/minecraft/Instances/Biotaxia Expert/mods',
+                'C:/Users/cdaguenet/curseforge/minecraft/Instances/backup/BExpert/mods'
+        )
+    }
+}
 
 dependencies {
-    compileOnly devMods
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    // flatDir names match the jar filenames. fg.deobf remaps SRG jars to official names so their mixins load in runClient.
+    implementation fg.deobf('local:Mekanism-1.20.1:10.4.16.80')
+    implementation fg.deobf('local:MekanismAdditions-1.20.1:10.4.16.80')
+    implementation fg.deobf('local:geckolib-forge-1.20.1:4.7.2')
+    implementation fg.deobf('local:resourcefullib-forge-1.20.1:2.1.29')
+    implementation fg.deobf('local:resourcefulconfig-forge-1.20.1:2.1.3')
+    implementation fg.deobf('local:creeperoverhaul-3.0.2:forge')
+    implementation fg.deobf('local:endermanoverhaul-forge-1.20.1:1.0.4')
+    implementation fg.deobf('local:jei-1.20.1-forge:15.56.0.205')
 }
 
-// NeoForge only loads mods from the game mods folder. The legacy classpath is not scanned.
-def installDevMods = tasks.register('installDevMods', Copy) {
-    from devMods
-    from(mezzConfig) {
-        include 'META-INF/jarjar/*.jar'
-        eachFile { file ->
-            file.path = file.name
-        }
-    }
-    into layout.projectDirectory.dir('run/mods')
-    includeEmptyDirs = false
-    doFirst {
-        delete layout.projectDirectory.file('run/mods/mezz_config-1.21.1-neoforge-0.6.8-standalone.jar')
-    }
+def clearDevMods = tasks.register('clearDevMods', Delete) {
+    delete layout.projectDirectory.dir('run/mods')
 }
 
-neoForge.runs.configureEach {
-    taskBefore installDevMods
+tasks.matching { it.name == 'runClient' || it.name == 'runServer' || it.name == 'prepareRuns' }.configureEach {
+    dependsOn clearDevMods
+    dependsOn 'createSrgToMcp'
 }
 
 var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     var replacements = [
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
-            neo_version            : neo_version,
-            neo_version_range      : neo_version_range,
+            forge_version          : forge_version,
+            forge_version_range    : forge_version_range,
             loader_version_range   : loader_version_range,
             mod_id                 : mod_id,
             mod_name               : mod_name,
@@ -99,9 +96,16 @@ var generateModMetadata = tasks.register('generateModMetadata', ProcessResources
 }
 
 sourceSets.main.resources.srcDir generateModMetadata
-neoForge.ideSyncTask generateModMetadata
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.release = 21
+    options.release = 17
+}
+
+jar {
+    manifest {
+        attributes([
+                'MixinConfigs': 'mekanismadditionsoverhaul.mixins.json'
+        ])
+    }
 }

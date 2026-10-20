@@ -4,10 +4,10 @@ import com.mekanismadditionsoverhaul.spider.SpiderModule;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.registries.DeferredHolder;
+import net.minecraftforge.registries.RegistryObject;
 
 public final class MaoCreativeTabs {
-    public static DeferredHolder<CreativeModeTab, CreativeModeTab> TAB;
+    public static RegistryObject<CreativeModeTab> TAB;
 
     private MaoCreativeTabs() {
     }

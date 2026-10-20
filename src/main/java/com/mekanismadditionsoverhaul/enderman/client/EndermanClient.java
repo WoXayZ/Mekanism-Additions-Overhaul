@@ -1,7 +1,9 @@
 package com.mekanismadditionsoverhaul.enderman.client;
 
 import com.mekanismadditionsoverhaul.client.MaoClient;
+import com.mekanismadditionsoverhaul.client.RendererReplacements;
 import com.mekanismadditionsoverhaul.enderman.EndermanModule;
+import mekanism.additions.common.registries.AdditionsEntityTypes;
 import tech.alexnijjar.endermanoverhaul.client.renderer.base.BaseEndermanEntityRenderer;
 import tech.alexnijjar.endermanoverhaul.common.registry.ModEntityTypes;
 
@@ -10,6 +12,7 @@ public final class EndermanClient {
     }
 
     public static void init() {
+        MaoClient.addEarly(event -> RendererReplacements.put(AdditionsEntityTypes.BABY_ENDERMAN.get(), ReplacedBabyEndermanRenderer::new));
         MaoClient.add(event -> {
             event.registerEntityRenderer(EndermanModule.BABY_BADLANDS_ENDERMAN.get(), context -> new BabyEndermanRenderer<>(context, ModEntityTypes.BADLANDS_ENDERMAN.get()));
             event.registerEntityRenderer(EndermanModule.BABY_CAVE_ENDERMAN.get(), context -> new BabyEndermanRenderer<>(context, ModEntityTypes.CAVE_ENDERMAN.get()));

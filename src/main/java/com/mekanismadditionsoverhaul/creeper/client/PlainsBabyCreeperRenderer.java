@@ -18,8 +18,8 @@ import tech.thatgravyboat.creeperoverhaul.client.RenderTypes;
 import tech.thatgravyboat.creeperoverhaul.common.utils.PlatformUtils;
 
 public class PlainsBabyCreeperRenderer extends GeoReplacedEntityRenderer<EntityBabyCreeper, PlainsBabyCreeper> {
-    private static final ResourceLocation GLOW = ResourceLocation.fromNamespaceAndPath("creeperoverhaul", "textures/entity/plains/plains_creeper_glow.png");
-    private static final ResourceLocation CHARGED = ResourceLocation.fromNamespaceAndPath("creeperoverhaul", "textures/entity/armor/creeper_armor.png");
+    private static final ResourceLocation GLOW = new ResourceLocation("creeperoverhaul", "textures/entity/plains/plains_creeper_glow.png");
+    private static final ResourceLocation CHARGED = new ResourceLocation("creeperoverhaul", "textures/entity/armor/creeper_armor.png");
 
     public PlainsBabyCreeperRenderer(EntityRendererProvider.Context context) {
         super(context, new PlainsBabyCreeperModel(), new PlainsBabyCreeper());
@@ -30,8 +30,8 @@ public class PlainsBabyCreeperRenderer extends GeoReplacedEntityRenderer<EntityB
     }
 
     @Override
-    public void preRender(PoseStack stack, PlainsBabyCreeper animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int color) {
-        super.preRender(stack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, color);
+    public void preRender(PoseStack stack, PlainsBabyCreeper animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        super.preRender(stack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
         float swell = this.currentCreeper().getSwelling(partialTick);
         float pulse = 1.0F + Mth.sin(swell * 100.0F) * swell * 0.01F;
         swell = Mth.clamp(swell, 0.0F, 1.0F);
@@ -75,8 +75,7 @@ public class PlainsBabyCreeperRenderer extends GeoReplacedEntityRenderer<EntityB
             }
             RenderType eyes = RenderTypes.getTransparentEyes(GLOW);
             VertexConsumer consumer = bufferSource.getBuffer(eyes);
-            int color = 0xFFFFFF | (int) (swell * 240.0F) << 24;
-            this.getRenderer().reRender(this.getDefaultBakedModel(animatable), poseStack, bufferSource, animatable, eyes, consumer, partialTick, packedLight, OverlayTexture.NO_OVERLAY, color);
+            this.getRenderer().reRender(this.getDefaultBakedModel(animatable), poseStack, bufferSource, animatable, eyes, consumer, partialTick, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, swell);
         }
     }
 
@@ -96,7 +95,7 @@ public class PlainsBabyCreeperRenderer extends GeoReplacedEntityRenderer<EntityB
             float age = this.renderer.getCurrentEntity().tickCount + partialTick;
             RenderType swirl = RenderTypes.getSwirl(CHARGED, age * 0.005F % 1.0F, age * 0.005F % 1.0F);
             VertexConsumer consumer = bufferSource.getBuffer(swirl);
-            this.getRenderer().reRender(this.getDefaultBakedModel(animatable), poseStack, bufferSource, animatable, swirl, consumer, partialTick, packedLight, OverlayTexture.NO_OVERLAY, -1);
+            this.getRenderer().reRender(this.getDefaultBakedModel(animatable), poseStack, bufferSource, animatable, swirl, consumer, partialTick, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         }
     }
 }
